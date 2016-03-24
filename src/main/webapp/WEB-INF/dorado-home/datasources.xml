@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bdf="http://www.bstek.com/bdf/schema"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	http://www.bstek.com/bdf/schema http://www.bstek.com/dorado/schema/bdf2.0.xsd ">
+
+	<bean id="bdf2.jdbcTransactionManager" class="com.bstek.bdf2.core.orm.transaction.JdbcTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<tx:annotation-driven proxy-target-class="true" transaction-manager="bdf2.jdbcTransactionManager" />
+	<!-- 修改数据源的时候,一定不要忘记修改sessionFactory中hibernate.dialect -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="url" value="jdbc:mysql://localhost:3306/bdf2?useUnicode=true&amp;characterEncoding=UTF-8" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+		<property name="minIdle" value="10" />
+		<property name="maxActive" value="20" />
+		<property name="maxWait" value="1000" />
+		<property name="removeAbandonedTimeout" value="60" />
+		<property name="removeAbandoned" value="true" />
+		<property name="logAbandoned" value="true" />
+	</bean>
+	<bean parent="bdf2.dataSourceRegister">
+		<property name="dataSource" ref="dataSource" />
+		<property name="name" value="mysql" />
+		<property name="asDefault" value="true" />
+	</bean>
+	<bean id="sessionFactory" parent="bdf2.sessionFactory">
+		<property name="dataSourceName" value="mysql" />
+		<property name="entityInterceptor" ref="bdf2.unByteCodeProxyInterceptor" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+		<property name="useTransactionAwareDataSource" value="true" />
+	</bean>
+	<bean class="com.bstek.bdf2.core.orm.AnnotationPackages">
+		<property name="scanPackages">
+			<list>
+				<value>com/jursoft/example/entity</value>
+				<value>com/dorado7/example/entity</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="bdf.transactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager" ref="bdf2.jdbcTransactionManager" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="insert*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="update*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="clear*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="restore*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="replace*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="start*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="process*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="execute*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="submit*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="audit*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="assign*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="end*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="commit*">PROPAGATION_REQUIRED,-Exception</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="bdf.transaction.beanNameAutoProxyCreator"	class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="proxyTargetClass" value="true"></property>
+		<property name="beanNames" value="*PR,*Service,*ServiceImpl,*Dao,*DaoImpl" />
+		<property name="interceptorNames">
+			<list>
+				<value>bdf.transactionInterceptor</value>
+			</list>
+		</property>
+	</bean>
+	<bdf:anonymous-url urlPattern="/index.jsp"/>
+	<bdf:anonymous-url urlPattern="/images/*.*"/>
+	<bdf:anonymous-url urlPattern="/favicon.ico"/>
+</beans>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig>
+  <Arguments/>
+  <Context/>
+  <Model>
+    <DataType name="result">
+      <Property name="creationType">com.dorado7.example.entity.QueryResult</Property>
+      <PropertyDef name="id">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="name">
+        <Property></Property>
+        <Property name="label">法人/自然人名称</Property>
+      </PropertyDef>
+      <PropertyDef name="type">
+        <Property></Property>
+        <Property name="label">记录类型</Property>
+      </PropertyDef>
+      <PropertyDef name="objectType">
+        <Property></Property>
+        <Property name="label">主体类型</Property>
+      </PropertyDef>
+      <PropertyDef name="goodCount">
+        <Property></Property>
+        <Property name="label">优良记录数</Property>
+      </PropertyDef>
+      <PropertyDef name="badCount">
+        <Property></Property>
+        <Property name="label">不良记录数</Property>
+      </PropertyDef>
+      <PropertyDef name="dishonestyCount">
+        <Property></Property>
+        <Property name="label">失信记录数</Property>
+      </PropertyDef>
+      <PropertyDef name="source">
+        <Property></Property>
+        <Property name="label">信息来源</Property>
+      </PropertyDef>
+      <PropertyDef name="time">
+        <Property></Property>
+        <Property name="label">更新时间</Property>
+      </PropertyDef>
+      <PropertyDef name="encryStr">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="content">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="str"/>
+      <PropertyDef name="details">
+        <Property name="dataType">[details]</Property>
+      </PropertyDef>
+    </DataType>
+    <DataType name="details">
+      <Property name="creationType">com.dorado7.example.entity.LostCredit</Property>
+      <PropertyDef name="source">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="releaseDate">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="name">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="certno">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="caseno">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="casedate">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="gender">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="executiveCourt">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="province">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="referNo">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="referCompany">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="obligation">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="executiveState">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="situation">
+        <Property></Property>
+      </PropertyDef>
+    </DataType>
+  </Model>
+  <View>
+    <DataSet id="dsResult">
+      <Property name="dataType">[result]</Property>
+      <Property name="dataProvider">lostCreditPR#findAll</Property>
+      <Property name="loadMode">manual</Property>
+    </DataSet>
+    <FieldSet>
+      <Property name="caption">失信查询</Property>
+      <Property name="height">70</Property>
+      <Buttons/>
+      <Children>
+        <Container layout="hbox">
+          <Label>
+            <Property name="text">被查询人姓名：</Property>
+          </Label>
+          <TextEditor id="nameText"/>
+          <Button>
+            <ClientEvent name="onClick">var textEdit = view.get(&quot;#nameText&quot;);&#xD;
+var nameStr = textEdit.get(&quot;text&quot;);&#xD;
+var dsResult = view.get(&quot;#dsResult&quot;);&#xD;
+dsResult.set(&quot;parameter&quot;, {&#xD;
+        name: nameStr,&#xD;
+    });&#xD;
+dsResult.flushAsync();&#xD;
+</ClientEvent>
+            <Property name="caption">查询</Property>
+          </Button>
+        </Container>
+      </Children>
+    </FieldSet>
+    <SplitPanel id="split">
+      <Property name="position">600</Property>
+      <Property name="collapseable">false</Property>
+      <Property name="resizeable">false</Property>
+      <MainControl>
+        <FieldSet>
+          <Property name="caption">失信记录</Property>
+          <Buttons/>
+          <Children>
+            <HtmlContainer id="hc"/>
+          </Children>
+        </FieldSet>
+      </MainControl>
+      <SideControl>
+        <DataPilot>
+          <Property name="dataSet">dsResult</Property>
+        </DataPilot>
+        <DataGrid>
+          <ClientEvent name="onDataRowClick">var hc = view.get(&quot;#hc&quot;);&#xD;
+str = arg.data._data.str;&#xD;
+hc.set(&quot;content&quot;,str);</ClientEvent>
+          <Property name="dataSet">dsResult</Property>
+          <Property name="selectionMode">multiRows</Property>
+          <RowNumColumn/>
+          <RowSelectorColumn>
+            <Property name="supportsOptionMenu">false</Property>
+          </RowSelectorColumn>
+          <DataColumn name="name">
+            <Property name="property">name</Property>
+          </DataColumn>
+          <DataColumn name="type">
+            <Property name="property">type</Property>
+          </DataColumn>
+          <DataColumn name="objectType">
+            <Property name="property">objectType</Property>
+          </DataColumn>
+          <DataColumn name="goodCount">
+            <Property name="property">goodCount</Property>
+          </DataColumn>
+          <DataColumn name="badCount">
+            <Property name="property">badCount</Property>
+          </DataColumn>
+          <DataColumn name="dishonestyCount">
+            <Property name="property">dishonestyCount</Property>
+          </DataColumn>
+          <DataColumn name="source">
+            <Property name="property">source</Property>
+          </DataColumn>
+          <DataColumn name="time">
+            <Property name="property">time</Property>
+          </DataColumn>
+        </DataGrid>
+      </SideControl>
+    </SplitPanel>
+    <Intro/>
+  </View>
+</ViewConfig>
